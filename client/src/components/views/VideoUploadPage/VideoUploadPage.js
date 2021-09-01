@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { Typography, Button, Form, message, Input, Icon } from 'antd';
 import Dropzone from 'react-dropzone';
-import axios from 'axios';
+import Axios from 'axios';
 import { useSelector } from "react-redux";
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
-const Private = [
+const PrivateOptions = [
     { value: 0, label: 'Private' },
     { value: 1, label: 'Public' }
 ]
 
-const Catogory = [
+const CatogoryOptions = [
     { value: 0, label: "Film & Animation" },
     { value: 0, label: "Autos & Vehicles" },
     { value: 0, label: "Music" },
@@ -25,32 +25,31 @@ function UploadVideoPage(props) {
 
     const [title, setTitle] = useState("");
     const [Description, setDescription] = useState("");
-    const [privacy, setPrivacy] = useState(0)
-    const [Categories, setCategories] = useState("Film & Animation")
+    const [Private, setPrivate] = useState(0)
+    const [Category, setCategory] = useState("Film & Animation")
     const [FilePath, setFilePath] = useState("")
     const [Duration, setDuration] = useState("")
     const [ThumbnailPath, setThumbnailPath] = useState("")
 
 
-    const handleChangeTitle = (event) => {
+    const onTitleChange = (event) => {
         // console.log(event.currentTarget)
         setTitle(event.currentTarget.value)
     }
 
-    const handleChangeDecsription = (event) => {
-        console.log(event.currentTarget.value)
+    const onDecsriptionChange = (event) => {
+        //console.log(event.currentTarget.value)
 
         setDescription(event.currentTarget.value)
     }
 
-    const handleChangeOne = (event) => {
-        setPrivacy(event.currentTarget.value)
+    const onPrivateChange  = (event) => {
+        setPrivate(event.currentTarget.value)
     }
 
-    const handleChangeTwo = (event) => {
-        setCategories(event.currentTarget.value)
+    const onCatogoryChange = (event) => {
+        setCategory(event.currentTarget.value)
     }
-
 
     const onDrop = (files) => {
 
@@ -61,7 +60,7 @@ function UploadVideoPage(props) {
         console.log(files)
         formData.append("file", files[0])
 
-        axios.post('/api/video/uploadfiles', formData, config)
+        Axios.post('/api/video/uploadfiles', formData, config)
             .then(response => {
                 if (response.data.success) {
 
@@ -74,7 +73,7 @@ function UploadVideoPage(props) {
 
                     //gerenate thumbnail with this filepath ! 
 
-                    axios.post('/api/video/thumbnail', variable)
+                    Axios.post('/api/video/thumbnail', variable)
                         .then(response => {
                             if (response.data.success) {
                                 console.log(response.data)
@@ -93,13 +92,44 @@ function UploadVideoPage(props) {
 
     }
 
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+        const variables = {
+            writer: user.userData._id,
+            title: title,
+            description: Description,
+            privacy: Private,
+            filePath: FilePath,
+            category: Category,
+            duration: Duration,
+            thumbnail: ThumbnailPath
+        }
+
+        Axios.post('/api/video/uploadVideo', variables)
+            .then(response => {
+                if (response.data.success) {
+                    console.log(response.data)
+                    
+                    message.success('성공적으로 업로드 완료!')
+                    setTimeout(()=>{
+                        props.history.push('/')
+                    },2000); //2초 뒤에 '/'으로 이동
+
+                } else {
+                    console.log("실패ㅠ")
+                    alert('비디오 업로드 실패ㅠ')
+                }
+            })
+    }
+
     return (
         <div style={{ maxWidth: '700px', margin: '2rem auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                 <Title level={2} > Upload Video</Title>
             </div>
 
-            <Form>
+            <Form onSubmit={onSubmit}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Dropzone
                         onDrop={onDrop}
@@ -126,26 +156,26 @@ function UploadVideoPage(props) {
                 <br /><br />
                 <label>Title</label>
                 <Input
-                    onChange={handleChangeTitle}
+                    onChange={onTitleChange}
                     value={title}
                 />
                 <br /><br />
                 <label>Description</label>
                 <TextArea
-                    onChange={handleChangeDecsription}
+                    onChange={onDecsriptionChange}
                     value={Description}
                 />
                 <br /><br />
 
-                <select onChange={handleChangeOne}>
-                    {Private.map((item, index) => (
+                <select onChange={onPrivateChange}>
+                    {PrivateOptions.map((item, index) => (
                         <option key={index} value={item.value}>{item.label}</option>
                     ))}
                 </select>
                 <br /><br />
 
-                <select onChange={handleChangeTwo}>
-                    {Catogory.map((item, index) => (
+                <select onChange={onCatogoryChange}>
+                    {CatogoryOptions.map((item, index) => (
                         <option key={index} value={item.label}>{item.label}</option>
                     ))}
                 </select>

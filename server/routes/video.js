@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-//const { Video } = require("../models/Video");
 
-const { auth } = require("../middleware/auth");
+const { Video } = require("../models/Video");
+
+//const { auth } = require("../middleware/auth");
 const multer = require("multer");
 var ffmpeg = require("fluent-ffmpeg");
 
@@ -36,6 +37,15 @@ router.post('/uploadfiles',(req,res) => {
             return res.json({success: false, err})
         }
         return res.json({success:true, url: res.req.file.path, fileName: res.req.file.filename})
+    })
+})
+
+router.post('/uploadVideo',(req,res) => {
+    //비디오를 정보들을 저장한다
+    const video = new Video(req.body); //req.body : client 에서 보낸 variable들이 담겨있음 ex)req.body.writer
+    video.save((err,doc)=>{
+        if(err) return res.json({success:false, err})
+        res.status(200).json({success:true})
     })
 })
 
