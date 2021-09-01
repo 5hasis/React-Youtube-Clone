@@ -29,7 +29,7 @@ function UploadVideoPage(props) {
     const [Categories, setCategories] = useState("Film & Animation")
     const [FilePath, setFilePath] = useState("")
     const [Duration, setDuration] = useState("")
-    const [Thumbnail, setThumbnail] = useState("")
+    const [ThumbnailPath, setThumbnailPath] = useState("")
 
 
     const handleChangeTitle = (event) => {
@@ -51,42 +51,6 @@ function UploadVideoPage(props) {
         setCategories(event.currentTarget.value)
     }
 
-    const onSubmit = (event) => {
-
-        event.preventDefault();
-
-        if (user.userData && !user.userData.isAuth) {
-            return alert('Please Log in First')
-        }
-
-        if (title === "" || Description === "" ||
-            Categories === "" || FilePath === "" ||
-            Duration === "" || Thumbnail === "") {
-            return alert('Please first fill all the fields')
-        }
-
-        const variables = {
-            writer: user.userData._id,
-            title: title,
-            description: Description,
-            privacy: privacy,
-            filePath: FilePath,
-            category: Categories,
-            duration: Duration,
-            thumbnail: Thumbnail
-        }
-
-        axios.post('/api/video/uploadVideo', variables)
-            .then(response => {
-                if (response.data.success) {
-                    alert('video Uploaded Successfully')
-                    props.history.push('/')
-                } else {
-                    alert('Failed to upload video')
-                }
-            })
-
-    }
 
     const onDrop = (files) => {
 
@@ -102,26 +66,28 @@ function UploadVideoPage(props) {
                 if (response.data.success) {
 
                     let variable = {
-                        filePath: response.data.filePath,
+                        url: response.data.url,
                         fileName: response.data.fileName
                     }
-                    setFilePath(response.data.filePath)
+
+                    setFilePath(response.data.url)
 
                     //gerenate thumbnail with this filepath ! 
 
                     axios.post('/api/video/thumbnail', variable)
                         .then(response => {
                             if (response.data.success) {
-                                setDuration(response.data.fileDuration)
-                                setThumbnail(response.data.thumbsFilePath)
+                                console.log(response.data)
+                                setDuration(response.data.fileDuration) // video.js에서 지정한 이름과 동일해야함
+                                setThumbnailPath(response.data.url)
                             } else {
-                                alert('Failed to make the thumbnails');
+                                alert('썸네일 생성 실패');
                             }
                         })
 
 
                 } else {
-                    alert('failed to save the video in server')
+                    alert('비디오 업로드 실패.')
                 }
             })
 
@@ -133,7 +99,7 @@ function UploadVideoPage(props) {
                 <Title level={2} > Upload Video</Title>
             </div>
 
-            <Form onSubmit={onSubmit}>
+            <Form>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Dropzone
                         onDrop={onDrop}
@@ -150,9 +116,9 @@ function UploadVideoPage(props) {
                         )}
                     </Dropzone>
 
-                    {Thumbnail !== "" &&
+                    {ThumbnailPath !== "" &&
                         <div>
-                            <img src={`http://localhost:5000/${Thumbnail}`} alt="haha" />
+                            <img src={`http://localhost:5000/${ThumbnailPath}`} alt="Thumbnail" />
                         </div>
                     }
                 </div>
