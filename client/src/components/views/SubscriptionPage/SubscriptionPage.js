@@ -6,13 +6,17 @@ import moment from 'moment';
 const {Title} = Typography
 const {Meta} = Card
 
-function LandingPage() {
+function SubscriptionPage() {
 
     const [Videos, setVideo] = useState([])
 
     useEffect(() => {
 
-        Axios.get('/api/video/getVideos')
+        const subscriptionVariable = {
+            userFrom : localStorage.getItem('userId')
+        }
+
+        Axios.post('/api/video/getSubscriptionVideos', subscriptionVariable )
             .then(response => {
                 if (response.data.success) {
                     console.log(response.data)
@@ -29,7 +33,7 @@ function LandingPage() {
         var minutes = Math.floor(video.duration / 60);
         var seconds = Math.floor(video.duration - minutes * 60);
 
-        return <Col lg={6} md={8} xs={24} key={index}>
+        return <Col lg={6} md={8} xs={24}>
             <a href={`/video/${video._id}`} >
                 <div style={{position:'relative'}}>
                 <img style={{ width: '100%' }} alt="thumbnail" src={`http://localhost:5000/${video.thumbnail}`} />
@@ -66,4 +70,5 @@ function LandingPage() {
     )
 }
 
-export default LandingPage
+
+export default SubscriptionPage
