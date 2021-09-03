@@ -3,6 +3,7 @@ import { Row, Col, List, Avatar } from 'antd';
 import Axios from 'axios';
 import SideVideo from './Sections/SideVideo';
 import Subscribe from './Sections/Subscribe';
+import Comment from './Sections/Comment';
 
 
 function VideoDetailPage(props) {
@@ -14,6 +15,7 @@ function VideoDetailPage(props) {
     }
 
     const [VideoDetail, setVideoDetail] = useState([])
+    const [Comments, setComments] = useState(initialState)
 
     useEffect(() => {
         
@@ -47,7 +49,8 @@ function VideoDetailPage(props) {
                                 description={VideoDetail.description}
                             />
                             {/* Comments */}
-                        </List.Item>
+                            <Comment postId={videoId} />
+                        </List.Item> 
     
                     </div>
                 </Col>
