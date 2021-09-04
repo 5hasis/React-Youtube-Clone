@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import Axios from 'axios'
+import { Button, Input } from 'antd';
 import { useSelector } from 'react-redux'
+import SingleComment from './SingleComment'
+
+const { TextArea } = Input;
 
 function Comment(props) {
 
@@ -26,7 +30,8 @@ function Comment(props) {
             .then(response => {
                 if (response.data.success) {
                     console.log(response.data.result) //route에서 보낸 result랑 이름 같아야함!
-                    setComment("")
+                    setcommentValue("")
+
                     props.refreshFunction(response.data.result)
                 } else {
                     alert('댓글 저장 실패')
@@ -41,7 +46,12 @@ function Comment(props) {
             <p> Replies</p>
             <hr />
             {/* Comment Lists  */}
-            
+            {props.commentLists && props.commentLists.map((comment, index)=>(
+                (!comment.responseTo && 
+                    <SingleComment refreshFunction={props.refreshFunction} comment={comment} postId={videoId} />
+                )
+            ))}
+    
 
             {/* Root Comment Form */}
             <form style={{ display: 'flex' }} onSubmit={onSubmit}>

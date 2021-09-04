@@ -10,7 +10,7 @@ const { Comment } = require("../models/Comment");
 
 router.post("/saveComment", (req, res) => {
 
-    const comment = newComment(req.body)
+    const comment = new Comment(req.body)
 
     comment.save((err, comment) => {
         if(err) return res.json({success:false, err})
@@ -24,6 +24,17 @@ router.post("/saveComment", (req, res) => {
                 res.status(200).json({success : true, result })
             })
     })
+});
+
+router.post("/getComments", (req, res) => {
+
+    Comment.find({"postId": req.body.videoId })
+        .populate('writer')
+        .exec((err, comments) => {
+            if(err) return res.json({success:false, err})
+            res.status(200).json({success : true, comments })
+        })
+
 });
 
 
